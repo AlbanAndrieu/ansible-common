@@ -1,0 +1,34 @@
+---
+
+dependencies: []
+
+galaxy_info:
+  author: Alban Andrieu
+  description: 'common described in 1 sentence...'
+  company: Nabla
+  license: GPLv3
+  min_ansible_version: '1.7.1'
+  platforms:
+    - name: Ubuntu
+      versions:
+        - precise
+        - trusty
+    - name: Debian
+      versions:
+        - wheezy
+        - jessie
+  categories: []
+
+ansigenome_info:
+  galaxy_id: ''
+
+  travis: True
+
+  synopsis: |
+    common described in a few paragraphs....
+
+  usage: |
+    Describe how to use common...
+
+  #custom: |
+  #  Any custom output you want after the usage section...
