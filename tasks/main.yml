@@ -25,7 +25,7 @@
 - name: common | Upgrade system
   apt: upgrade={{ apt_upgrade }}
   when: (apt_upgrade == "safe" or apt_upgrade == "full" or apt_upgrade == "dist")
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_upgrade_system_enabled
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_upgrade_system_enabled == true
 #  ignore_errors: yes
 
 - name: common | Checking if Sources are Available
@@ -149,10 +149,10 @@
 #below it can be customized
 - name: common | Append additional sources
   apt_repository: repo={{ item }} update_cache=yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_repositories == true
   with_items: apt_repositories
 
 - name: common | Install additional packages
   apt: pkg={{item}}
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_packages
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_packages == true
   with_items: apt_install_packages_list
