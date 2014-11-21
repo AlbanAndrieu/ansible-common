@@ -1,5 +1,5 @@
 apt_cache_valid_time: 3600    # Time (in seconds) the apt cache stays valid
-apt_upgrade_system_enabled: true
+apt_upgrade_system_enabled: yes
 apt_upgrade: safe             # Perfoms aptupgrade. Values are (safe, full, dist)
 apt_install_recommends: no    # Install the "recommended" packages
 apt_install_suggests: no      # Install the "suggested" packages
@@ -12,11 +12,11 @@ apt_install_packages_list:    # List of packages which be installed
   - pciutils
   - screen
 
-stats_enabled           : true
-utilities_enabled       : true
-editors_enabled         : true
-cowsay_enabled          : true
-perl_enabled            : true
-python_enabled          : true
+stats_enabled           : yes
+utilities_enabled       : yes
+editors_enabled         : yes
+cowsay_enabled          : yes
+perl_enabled            : yes
+python_enabled          : yes
 
 apt_notification_email: "root"
