@@ -2,4 +2,6 @@
 - hosts: all
   sudo: true
   roles:
-    - role: ./
+    - { role: ./,
+        apt_upgrade_system_enabled: no
+      }
