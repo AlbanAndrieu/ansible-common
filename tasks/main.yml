@@ -22,6 +22,7 @@
   with_items:
     - python-apt
     - python-pycurl
+    - aptitude    
     - unattended-upgrades
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
 
@@ -118,7 +119,6 @@
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and cowsay_enabled
   tags: package
   with_items:
-   - aptitude
    - randomize-lines
    - cowsay
    - fortunes
