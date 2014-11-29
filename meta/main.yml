@@ -6,7 +6,7 @@ dependencies:
   - { role: geerlingguy.ntp }  
   - { role: locale }
   - { role: alban.andrieu.hostname }
-  - { role: geerlingguy.java }
+  - { role: java }
       
 galaxy_info:
   author: Alban Andrieu
