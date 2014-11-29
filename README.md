@@ -1,22 +1,24 @@
-## common
+## alban.andrieu.common
 
 [![Travis CI](http://img.shields.io/travis/AlbanAndrieu/ansible-common.svg?style=flat)](http://travis-ci.org/AlbanAndrieu/ansible-common) [![Branch](http://img.shields.io/github/tag/AlbanAndrieu/ansible-common.svg?style=flat-square)](https://github.com/AlbanAndrieu/ansible-common/tree/master) [![Donate](https://img.shields.io/gratipay/AlbanAndrieu.svg?style=flat)](https://www.gratipay.com/AlbanAndrieu)  [![Platforms](http://img.shields.io/badge/platforms-debian%20/%20ubuntu-lightgrey.svg?style=flat)](#)
 
 common described in a few paragraphs....
 
 
+### Role dependencies
 
+- `python`- `geerlingguy.java`- `locale`- `ansible`- `geerlingguy.ntp`- `alban.andrieu.hostname`
 
 ### Role variables
 
 List of default variables available in the inventory:
 
 ```yaml
-    apt_cache_valid_time: 3600    # Time (in seconds) the apt cache stays valid
-    apt_upgrade_system_enabled: true
+        apt_cache_valid_time: 3600    # Time (in seconds) the apt cache stays valid
+    apt_upgrade_system_enabled: yes
     apt_upgrade: safe             # Perfoms aptupgrade. Values are (safe, full, dist)
-    #apt_install_recommends: no    # Install the "recommended" packages
-    #apt_install_suggests: no      # Install the "suggested" packages
+    apt_install_recommends: no    # Install the "recommended" packages
+    apt_install_suggests: no      # Install the "suggested" packages
     apt_install_repositories: no  # Install some repositories (see lise bellow)
     apt_repositories: []          # List of sources which be added
     apt_install_packages: no      # Install some utilities (see lise bellow)
@@ -26,12 +28,12 @@ List of default variables available in the inventory:
       - pciutils
       - screen
     
-    stats_enabled           : true
-    utilities_enabled       : true
-    editors_enabled         : true
-    cowsay_enabled          : true
-    perl_enabled            : true
-    python_enabled          : true
+    stats_enabled           : yes
+    utilities_enabled       : yes
+    editors_enabled         : yes
+    cowsay_enabled          : yes
+    perl_enabled            : yes
+    python_enabled          : yes
     
     apt_notification_email: "root"
 ```
@@ -44,7 +46,7 @@ Describe how to use common...
 
 ### Authors and license
 
-`common` role was written by:
+`alban.andrieu.common` role was written by:
 - [Alban Andrieu](nabla.mobi) | [e-mail](mailto:alban.andrieu@free.fr) | [Twitter](https://twitter.com/AlbanAndrieu)
 - License: [GPLv3](https://tldrlegal.com/license/gnu-general-public-license-v3-%28gpl-3%29)
 

@@ -47,7 +47,7 @@
   when: (ansible_distribution == 'Debian' and sources.stdout == 'a')
 #      when: "ansible_os_family == 'RedHat' and sources.stdout == 'a'"
 
-# ansible
+#SEE ansible role
 - name: common | Test ansible is installed
   shell: ansible --version
   register: ansible_is_installed
@@ -137,17 +137,18 @@
    - libpam-runtime
    - libio-pty-perl
 
-- name: Install pip python package
-  apt:
-    pkg: "{{ item }}"
-    state: latest
-    update_cache: yes
-    cache_valid_time: 600
-  sudo: yes      
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
-  with_items:
-    - python-dev
-    - python-pip
+#SEE python role
+#- name: Install pip python package
+#  apt:
+#    pkg: "{{ item }}"
+#    state: latest
+#    update_cache: yes
+#    cache_valid_time: 600
+#  sudo: yes      
+#  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
+#  with_items:
+#    - python-dev
+#    - python-pip
 
 - name: common | Install python
   apt: pkg={{ item }} state=present update_cache=yes
@@ -155,7 +156,7 @@
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
   tags: package
   with_items:
-   - python
+#   - python
    - python-keyczar
    - python-setuptools
    - python-software-properties
