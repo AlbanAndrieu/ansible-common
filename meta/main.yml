@@ -4,7 +4,7 @@ dependencies:
   - { role: python }
 #  - { role: ansible }
   - { role: geerlingguy.ntp }  
-  - { role: locale }
+#  - { role: locale }
   - { role: alban.andrieu.hostname }
   - { role: java }
       
