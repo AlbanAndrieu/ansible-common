@@ -5,7 +5,7 @@ dependencies:
 #  - { role: ansible }
   - { role: geerlingguy.ntp }  
 #  - { role: locale }
-  - { role: alban.andrieu.hostname }
+#  - { role: alban.andrieu.hostname }
   - { role: java }
       
 galaxy_info:
