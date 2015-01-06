@@ -111,6 +111,7 @@
 #   - monit   see https://galaxy.ansible.com/list#/roles/1575
    - upstart
    - gksu
+#   - wireshark TODO create a role
 
 #TO CHECK sudo aptitude install cowsay fortunes fortunes-fr
 - name: common | Install cowsay
