@@ -7,7 +7,7 @@ common described in a few paragraphs....
 
 ### Role dependencies
 
-- `python`- `geerlingguy.java`- `locale`- `ansible`- `geerlingguy.ntp`- `alban.andrieu.hostname`
+- `python`- `geerlingguy.ntp`
 
 ### Role variables
 
@@ -15,7 +15,7 @@ List of default variables available in the inventory:
 
 ```yaml
         apt_cache_valid_time: 3600    # Time (in seconds) the apt cache stays valid
-    apt_upgrade_system_enabled: yes
+    apt_upgrade_system_enabled: no
     apt_upgrade: safe             # Perfoms aptupgrade. Values are (safe, full, dist)
     apt_install_recommends: no    # Install the "recommended" packages
     apt_install_suggests: no      # Install the "suggested" packages
