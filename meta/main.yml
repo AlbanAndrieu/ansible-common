@@ -1,13 +1,13 @@
 ---
 #dependencies: []
-dependencies: 
+dependencies:
   - { role: python }
-#  - { role: geerlingguy.ntp }  
-#  - { role: ansible }  
+  - { role: geerlingguy.ntp }
+#  - { role: ansible }
 #  - { role: locale }
 #  - { role: alban.andrieu.hostname }
 #  - { role: java }
-      
+
 galaxy_info:
   author: Alban Andrieu
   description: 'common described in 1 sentence...'
@@ -29,7 +29,7 @@ ansigenome_info:
   galaxy_id: ''
   galaxy_user: 'alban.andrieu'
   galaxy_name: 'common'
-  
+
   travis: True
 
   synopsis: |
