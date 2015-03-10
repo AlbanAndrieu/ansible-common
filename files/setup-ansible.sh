@@ -47,7 +47,49 @@ elif [ "$os_type" == "GNU/Linux" ]; then
 		sudo_cmd=sudo
 		echo "Found CentOS distro"
 		sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
-		sudo yum install ansible -y || exit 1
+		sudo yum install ansible -y || exit 1		
+	elif [ "$(check_linux_distro Red)" == "0" ]; then
+		sudo_cmd=sudo
+		echo "Found Red Hat distro"
+		#TODO find a ansible role that manage python 27 for red hat too
+		echo "Make sure python 27 is installed"
+		echo "https://www.digitalocean.com/community/tutorials/how-to-set-up-python-2-7-6-and-3-3-3-on-centos-6-4"
+
+        wget http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tar.xz
+
+		# Let's decode (-d) the XZ encoded tar archive:
+		xz -d Python-2.7.6.tar.xz
+
+		# Now we can perform the extraction:
+		tar -xvf Python-2.7.6.tar
+
+		# Let's download the installation file using wget:
+		#wget --no-check-certificate https://pypi.python.org/packages/source/s/setuptools/setuptools-1.4.2.tar.gz
+
+		# Extract the files from the archive:
+		#tar -xvf setuptools-1.4.2.tar.gz
+
+		# Enter the extracted directory:
+		#cd setuptools-1.4.2
+
+		# Install setuptools using the Python we've installed (2.7.6)
+		#python2.7 setup.py install
+
+		echo "Installing pip"
+        curl https://raw.githubusercontent.com/pypa/pip/master/contrib/get-pip.py | python2.7 -
+
+        #pip install virtualenv
+
+		echo "Switch env to python 27"
+        export PATH="/opt/rh/python27/root/usr/bin:/usr/lib64/qt-3.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
+        export LD_LIBRARY_PATH="/opt/rh/python27/root/usr/lib64"
+
+        python -V
+        python2.7 -V
+
+        pip -V
+
+		sudo pip2.7 install ansible || exit 1		
 	else
 		echo "Unknown Linux distro: $(cat /etc/issue)" && exit 1
 	fi

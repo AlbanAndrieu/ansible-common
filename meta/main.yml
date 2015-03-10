@@ -2,8 +2,8 @@
 #dependencies: []
 dependencies: 
   - { role: python }
-#  - { role: ansible }
-  - { role: geerlingguy.ntp }  
+#  - { role: geerlingguy.ntp }  
+#  - { role: ansible }  
 #  - { role: locale }
 #  - { role: alban.andrieu.hostname }
 #  - { role: java }
