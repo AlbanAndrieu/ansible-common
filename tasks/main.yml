@@ -42,7 +42,7 @@
 
 - debug: msg=" common | sources value is {{ sources.stdout }} "
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
-  
+
 - name: common | Adding source.
   action: shell echo "deb http://url/{{ ansible_distribution }}/stable      {{ ansible_lsb.codename }} main" | tr "[:upper:]" "[:lower:]" >> /etc/apt/sources.list
   sudo: yes
@@ -112,7 +112,6 @@
 #   - monit   see https://galaxy.ansible.com/list#/roles/1575
    - upstart
    - gksu
-#   - wireshark TODO create a role
 
 #TO CHECK sudo aptitude install cowsay fortunes fortunes-fr
 - name: common | Install cowsay
