@@ -1,15 +1,17 @@
 ---
 language: python
 python: "2.7"
+env:
+  - ANSIBLE_VERSION=1.9.2
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq python-apt python-pycurl
 install:
   # Install Ansible.
-  - pip install ansible
+  - sudo pip install ansible==$ANSIBLE_VERSION
 
   # Add ansible.cfg to pick up roles path.
-  #- "printf '[defaults]\nroles_path = ../' > ansible.cfg"
+  #- "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
 
   # Install dependencies.
   - git clone https://github.com/Stouts/Stouts.python.git python
@@ -18,7 +20,7 @@ install:
   - git clone https://github.com/AlbanAndrieu/ansible-locale.git locale
   - git clone https://github.com/AlbanAndrieu/ansible-hostname.git alban.andrieu.hostname
   - git clone https://github.com/AlbanAndrieu/ansible-java.git java
-        
+
 script:
   - ansible --version
   - export ANSIBLE_ROLES_PATH="../"
