@@ -151,7 +151,7 @@
 #    - python-dev
 #    - python-pip
 
-- name: common | Install python
+- name: common | Install python tools
   apt: pkg={{ item }} state=present update_cache=yes
   sudo: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
@@ -164,8 +164,8 @@
    - build-essential
 
 - name: common | Install winrm python module for ansible to work on windows
-  command: sudo pip install https://github.com/diyan/pywinrm/archive/df049454a9309280866e0156805ccda12d71c93a.zip --upgrade
-#  pip: name=https://github.com/diyan/pywinrm/archive/df049454a9309280866e0156805ccda12d71c93a.zip --upgrade
+  pip: name="https://github.com/diyan/pywinrm/archive/df049454a9309280866e0156805ccda12d71c93a.zip" state=present
+  #command: pip install https://github.com/diyan/pywinrm/archive/df049454a9309280866e0156805ccda12d71c93a.zip --upgrade
   sudo: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
   tags: package
