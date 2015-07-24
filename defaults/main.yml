@@ -18,5 +18,6 @@ editors_enabled         : yes
 cowsay_enabled          : yes
 perl_enabled            : yes
 python_enabled          : yes
+# for pip_version, please see python_versions: [2.7, 3.4] from role https://github.com/Stouts/Stouts.python.git python
 pip_version             : 3.4
 apt_notification_email: "root"
