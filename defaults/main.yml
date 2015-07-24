@@ -18,5 +18,5 @@ editors_enabled         : yes
 cowsay_enabled          : yes
 perl_enabled            : yes
 python_enabled          : yes
-
+pip_version             : 3.4
 apt_notification_email: "root"
