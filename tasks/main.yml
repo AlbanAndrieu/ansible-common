@@ -109,6 +109,7 @@
    - iotop
    - htop
    - iftop
+   - iperf
 #   - monit   see https://galaxy.ansible.com/list#/roles/1575
    - upstart
    - gksu
