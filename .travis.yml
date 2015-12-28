@@ -11,7 +11,7 @@ before_install:
   - sudo apt-get install -qq python-apt python-pycurl
 install:
   # Install Ansible.
-  - pip install ansible==$ANSIBLE_VERSION
+  - sudo pip install ansible==$ANSIBLE_VERSION
 
   # Add ansible.cfg to pick up roles path.
   - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
@@ -25,7 +25,7 @@ install:
   - git clone https://github.com/AlbanAndrieu/ansible-java.git java
 
 script:
-  - ansible --version
+  - sudo ansible --version
   - export ANSIBLE_ROLES_PATH="../"
 #  - echo localhost > inventory
   - ansible-playbook -i hosts --syntax-check common.yml
