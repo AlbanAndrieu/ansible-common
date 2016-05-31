@@ -98,6 +98,8 @@
    - curl
    - ssh
 
+#See https://blog.serverdensity.com/80-linux-monitoring-tools-know/
+
 - name: common | Install monitoring tools
   apt: pkg={{ item }} state=present update_cache=yes
   sudo: yes
@@ -108,10 +110,13 @@
    - iotop
    - htop
    - iftop
+   - jnettop
    - iperf
 #   - monit   see https://galaxy.ansible.com/list#/roles/1575
    - upstart
    - gksu
+   - powertop
+   - discus
 
 #TO CHECK sudo aptitude install cowsay fortunes fortunes-fr
 - name: common | Install cowsay
