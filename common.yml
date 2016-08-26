@@ -4,5 +4,5 @@
   roles:
     - { role: ./,
         apt_upgrade_system_enabled: no,
-        python_versions: 2.7
+        python_versions: [2.7]
       }
