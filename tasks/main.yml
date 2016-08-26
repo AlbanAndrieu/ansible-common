@@ -39,8 +39,7 @@
 - name: common | Upgrade system
   apt: upgrade={{ apt_upgrade }}
   sudo: yes
-  when: (apt_upgrade == "safe" or apt_upgrade == "full" or apt_upgrade == "dist")
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_upgrade_system_enabled
+  when: (apt_upgrade == "safe" or apt_upgrade == "full" or apt_upgrade == "dist") and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_upgrade_system_enabled
 #  ignore_errors: yes
 
 - name: common | Checking if Sources are Available
