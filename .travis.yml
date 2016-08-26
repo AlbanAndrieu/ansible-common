@@ -2,7 +2,9 @@
 language: python
 python:
   - 2.7
-  - 3.4
+#  - 3.3
+#  - 3.4
+#  - 3.5
 cache:
   directories:
     - $HOME/.cache/pip
@@ -32,9 +34,8 @@ install:
   - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
 
   # Install dependencies.
-  - git clone https://github.com/Stouts/Stouts.python.git python
-  #- git clone https://github.com/debops/ansible-role-ansible.git ansible
-  - git clone https://github.com/geerlingguy/ansible-role-ntp.git geerlingguy.ntp
+  - git clone https://github.com/AlbanAndrieu/Stouts.python.git python
+  - git clone https://github.com/AlbanAndrieu/ansible-role-ntp.git geerlingguy.ntp
   - git clone https://github.com/AlbanAndrieu/ansible-locale.git locale
   - git clone https://github.com/AlbanAndrieu/ansible-hostname.git alban.andrieu.hostname
   - git clone https://github.com/AlbanAndrieu/ansible-java.git java
