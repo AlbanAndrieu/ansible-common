@@ -24,7 +24,7 @@ if [ "$os_type" == "Cygwin" ]; then
 	rm -rf $tmp_dir
 
 	echo "Installing cygwin packages for ansible dependencies"
-	apt-cyg install python gcc-core wget openssh 
+	apt-cyg install python gcc-core wget openssh
 	if [ "$?" == "1" ]; then
 		echo "Check that mirror site is correct."
 		echo "Use apt-cyg -m <url> show to set a new mirror"
@@ -47,7 +47,8 @@ elif [ "$os_type" == "GNU/Linux" ]; then
 		sudo_cmd=sudo
 		echo "Found CentOS distro"
 		sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
-		sudo yum install ansible -y || exit 1		
+		sudo yum install python-pip -y || exit 1
+		sudo yum install ansible -y || exit 1
 	elif [ "$(check_linux_distro Red)" == "0" ]; then
 		sudo_cmd=sudo
 		echo "Found Red Hat distro"
@@ -89,7 +90,7 @@ elif [ "$os_type" == "GNU/Linux" ]; then
 
         pip -V
 
-		sudo pip2.7 install ansible || exit 1		
+		sudo pip2.7 install ansible || exit 1
 	else
 		echo "Unknown Linux distro: $(cat /etc/issue)" && exit 1
 	fi
@@ -112,8 +113,8 @@ fi
 echo "Sudo command is '$sudo_cmd'"
 
 echo -n "Test if pip is installed..."
-pip --version &> /dev/null && echo "OK" 
-if [ "$?" == "1" ]; then 
+pip --version &> /dev/null && echo "OK"
+if [ "$?" == "1" ]; then
 	echo "FAILED"; exit 1
 fi
 

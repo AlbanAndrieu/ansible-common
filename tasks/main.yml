@@ -16,6 +16,16 @@
   sudo: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
+- name: common | Update the proxy configuration
+  template:
+    src: etc_apt.conf
+    dest: /etc/apt/apt.conf
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_proxy_enabled
+
 - name: common | Make sure the required packages are installed
   apt: pkg={{ item }} state=present
   sudo: yes

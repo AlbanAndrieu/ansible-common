@@ -3,6 +3,8 @@ apt_upgrade_system_enabled: no
 apt_upgrade: safe             # Perfoms aptupgrade. Values are (safe, full, dist)
 apt_install_recommends: no    # Install the "recommended" packages
 apt_install_suggests: no      # Install the "suggested" packages
+apt_install_proxy: 'http://yourproxyaddress:proxyport'
+apt_install_proxy_enabled: no
 apt_install_repositories: no  # Install some repositories (see list bellow)
 apt_repositories: []          # List of sources which be added
 apt_install_packages: no      # Install some utilities (see lise bellow)
