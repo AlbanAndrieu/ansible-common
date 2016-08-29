@@ -22,5 +22,4 @@ perl_enabled            : yes
 python_enabled          : yes
 # for pip_version, please see python_versions: [2.7, 3.4] from role https://github.com/Stouts/Stouts.python.git python
 python_versions         : [2.7]
-#python_install          : [virtualenv]
 apt_notification_email: "root"
