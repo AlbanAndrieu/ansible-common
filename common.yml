@@ -1,9 +1,29 @@
 ---
 - hosts: all
-  sudo: true
+  become: true
+
   roles:
     - { role: ./,
         apt_upgrade_system_enabled: no
         #python_versions: [2.7],
         #python_install: [virtualenv]
       }
+
+  tasks:
+    - name: Check python
+      command: which python
+      register: python_path
+
+    - debug:
+        msg: "Python was installed in {{python_path.stdout}}"
+
+    - fail:
+        msg: "Python Not Found, tests failed."
+      when: python_path.stdout != "/usr/bin/python"
+
+    - command -v python || exit 1
+    - command -v pip || exit 1
+    - command -v virtualenv || exit 1
+
+    - command -v python3.4 || exit 1
+    - command -v pip3.4 || exit 1

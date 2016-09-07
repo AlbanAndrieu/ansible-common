@@ -9,7 +9,7 @@ cache:
   directories:
     - $HOME/.cache/pip
 env:
-  - ANSIBLE_VERSION=2.1.0.0
+  - ANSIBLE_VERSION=2.1.1.0
 cache: bundler
 #sudo: false
 sudo: required
@@ -47,10 +47,10 @@ script:
   #- echo localhost > hosts
 
   # Check syntax
-  - sudo ansible-playbook -i hosts --syntax-check common.yml
+  - sudo ansible-playbook -i hosts --syntax-check common.yml -e "python_versions=3.4"
 
   # First run
-  - sudo ansible-playbook -i hosts --connection=local --sudo -vvvv common.yml
+  - sudo ansible-playbook -i hosts --connection=local --sudo -vvvv common.yml -e "python_versions=3.4"
 
   #- coverage run --source=yourpackagename setup.py test
 
