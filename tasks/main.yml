@@ -178,10 +178,11 @@
    - build-essential
 
 - name: common | Install winrm python module for ansible to work on windows
-  pip: name="https://github.com/diyan/pywinrm/archive/df049454a9309280866e0156805ccda12d71c93a.zip" state=present executable=pip{{python_version}}
+  #executable=pip{{ python_versions }}
+  pip: name="https://github.com/diyan/pywinrm/archive/df049454a9309280866e0156805ccda12d71c93a.zip" state=present
   #command: pip install https://github.com/diyan/pywinrm/archive/df049454a9309280866e0156805ccda12d71c93a.zip --upgrade
   sudo: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
+  when: python_enabled
   tags: package
 
 #- name: Installing common packages.
