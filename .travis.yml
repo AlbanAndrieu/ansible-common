@@ -31,7 +31,7 @@ install:
   - sudo pip install ansible==$ANSIBLE_VERSION
 
   # Add ansible.cfg to pick up roles path.
-  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+  #- "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
 
   # Install dependencies.
   - git clone https://github.com/AlbanAndrieu/Stouts.python.git python
@@ -47,10 +47,10 @@ script:
   #- echo localhost > hosts
 
   # Check syntax
-  - sudo ansible-playbook -i hosts --syntax-check common.yml -e "python_versions=3.4"
+  - sudo ansible-playbook -i hosts --syntax-check common.yml -e "python_versions=[3.4]"
 
   # First run
-  - sudo ansible-playbook -i hosts --connection=local --sudo -vvvv common.yml -e "python_versions=3.4"
+  - sudo ansible-playbook -i hosts --connection=local --sudo -vvvv common.yml -e "python_versions=[3.4]"
 
   #- coverage run --source=yourpackagename setup.py test
 
