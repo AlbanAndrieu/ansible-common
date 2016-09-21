@@ -3,7 +3,7 @@
 
 - name: common | Update APT caches.
   apt: update_cache=yes cache_valid_time={{ apt_cache_valid_time }}
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 - name: common | Update the configuration
@@ -13,7 +13,7 @@
     owner: root
     group: root
     mode: 0644
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 - name: common | Update the proxy configuration
@@ -23,12 +23,12 @@
     owner: root
     group: root
     mode: 0644
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_proxy_enabled
 
 - name: common | Make sure the required packages are installed
   apt: pkg={{ item }} state=present
-  sudo: yes
+  become: yes
   with_items:
     - python-apt
     - python-pycurl
@@ -38,15 +38,19 @@
 
 - name: common | Upgrade system
   apt: upgrade={{ apt_upgrade }}
-  sudo: yes
+  become: yes
   when: (apt_upgrade == "safe" or apt_upgrade == "full" or apt_upgrade == "dist") and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_upgrade_system_enabled
-#  ignore_errors: yes
+
+- name: common | Upgrade system
+  yum: name=* state=latest
+  become: yes
+  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux') and apt_upgrade_system_enabled
 
 - name: common | Checking if Sources are Available
   action: shell echo a$(cat /etc/apt/sources.list | grep $(echo   'http://url/{{ ansible_distribution }}/stable' | tr "[:upper:]" "[:lower:]"  ))
   register: sources
   ignore_errors: true
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 - debug: msg=" common | sources value is {{ sources.stdout }} "
@@ -54,7 +58,7 @@
 
 - name: common | Adding source.
   action: shell echo "deb http://url/{{ ansible_distribution }}/stable      {{ ansible_lsb.codename }} main" | tr "[:upper:]" "[:lower:]" >> /etc/apt/sources.list
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' and sources.stdout == 'a')
 #      when: "ansible_os_family == 'RedHat' and sources.stdout == 'a'"
 
@@ -62,26 +66,26 @@
   shell: ansible --version
   register: ansible_is_installed
   ignore_errors: yes
-  sudo: yes
+  become: yes
 
 - name: common | Run install script as sudo
   script: setup-ansible.sh
-  sudo: yes
+  become: yes
   when: "ansible_is_installed|failed and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'CentOS')"
   register: ansible_init_used_sudo
 
 - name: common | Run install script without sudo
   script: setup-ansible.sh
-  sudo: yes
+  become: yes
   when: ansible_is_installed|failed and ansible_init_used_sudo|skipped
 
 - name: common | Test ansible is installed
   shell: ansible --version
-  sudo: yes
+  become: yes
 
 - name: common | Install update notification tools
   apt: pkg={{ item }} state=present update_cache=yes
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
   tags: package
   with_items:
@@ -94,12 +98,12 @@
     owner: root
     group: root
     mode: 0644
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 - name: common | Install utility tools
   apt: pkg={{ item }} state=present update_cache=yes
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
   tags: package
   with_items:
@@ -111,7 +115,7 @@
 
 - name: common | Install monitoring tools
   apt: pkg={{ item }} state=present update_cache=yes
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and stats_enabled
   tags: package
   with_items:
@@ -130,7 +134,7 @@
 #TO CHECK sudo aptitude install cowsay fortunes fortunes-fr
 - name: common | Install cowsay
   apt: pkg={{ item }} state=present update_cache=yes
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and cowsay_enabled
   tags: package
   with_items:
@@ -141,7 +145,7 @@
 
 - name: common | Install perl
   apt: pkg={{ item }} state=present update_cache=yes
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
   tags: package
   with_items:
@@ -159,7 +163,7 @@
 #    state: latest
 #    update_cache: yes
 #    cache_valid_time: 600
-#  sudo: yes
+#  become: yes
 #  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
 #  with_items:
 #    - python-dev
@@ -167,7 +171,7 @@
 
 - name: common | Install python tools
   apt: pkg={{ item }} state=present update_cache=yes
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
   tags: package
   with_items:
@@ -181,25 +185,19 @@
   #executable=pip{{ python_versions }}
   pip: name="https://github.com/diyan/pywinrm/archive/df049454a9309280866e0156805ccda12d71c93a.zip" state=present
   #command: pip install https://github.com/diyan/pywinrm/archive/df049454a9309280866e0156805ccda12d71c93a.zip --upgrade
-  sudo: yes
+  become: yes
   when: python_enabled
   tags: package
-
-#- name: Installing common packages.
-#  apt: state=present pkg={{ item }}
-#  with_items:
-#  - libcap2-bin
-#  - libssl-dev
 
 #below it can be customized
 - name: common | Append additional sources
   apt_repository: repo={{ item }} update_cache=yes
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_repositories
   with_items: apt_repositories
 
 - name: common | Install additional packages
   apt: pkg={{item}}
-  sudo: yes
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_packages
   with_items: apt_install_packages_list
