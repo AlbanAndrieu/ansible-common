@@ -70,6 +70,8 @@
 
 - name: common | Run install script as sudo
   script: setup-ansible.sh
+  args:
+    executable: /bin/bash
   become: yes
   when: "ansible_is_installed|failed and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'CentOS')"
   register: ansible_init_used_sudo
