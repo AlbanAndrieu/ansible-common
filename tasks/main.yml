@@ -134,13 +134,27 @@
    - discus
 
 #TO CHECK sudo aptitude install cowsay fortunes fortunes-fr
+
+- name: common | Install cowsay randomize lines
+  apt_repository: repo="ppa:inameiname/stable" state={{ util_repository_state|default('present') }} update_cache=yes
+  become: yes
+  when: ( ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version in ['16.04']) and cowsay_enabled
+  tags: cowsay
+
+- name: common | Install cowsay randomize lines
+  apt: pkg={{ item }} state=present update_cache=yes
+  become: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04'] and cowsay_enabled
+  tags: cowsay
+  with_items:
+   - randomize-lines
+
 - name: common | Install cowsay
   apt: pkg={{ item }} state=present update_cache=yes
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and cowsay_enabled
   tags: package
   with_items:
-   - randomize-lines
    - cowsay
    - fortunes
    - fortunes-fr
