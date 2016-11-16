@@ -210,10 +210,10 @@
   apt_repository: repo={{ item }} update_cache=yes
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_repositories
-  with_items: apt_repositories
+  with_items: "{{apt_repositories}}"
 
 - name: common | Install additional packages
   apt: pkg={{item}}
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_packages
-  with_items: apt_install_packages_list
+  with_items: "{{apt_install_packages_list}}"
