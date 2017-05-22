@@ -172,19 +172,6 @@
    - libpam-runtime
    - libio-pty-perl
 
-#SEE python role
-#- name: Install pip python package
-#  apt:
-#    pkg: "{{ item }}"
-#    state: latest
-#    update_cache: yes
-#    cache_valid_time: 600
-#  become: yes
-#  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
-#  with_items:
-#    - python-dev
-#    - python-pip
-
 - name: common | Install python tools
   apt: pkg={{ item }} state=present update_cache=yes
   become: yes
@@ -197,13 +184,8 @@
    - python-software-properties
    - build-essential
 
-- name: common | Install winrm python module for ansible to work on windows
-  #executable=pip{{ python_versions }}
-  pip: name="https://github.com/diyan/pywinrm/archive/df049454a9309280866e0156805ccda12d71c93a.zip" state=present
-  #command: pip install https://github.com/diyan/pywinrm/archive/df049454a9309280866e0156805ccda12d71c93a.zip --upgrade
-  become: yes
-  when: python_enabled
-  tags: package
+#TODO Disable ipv6
+#http://www.neuraldump.com/2016/11/how-to-disable-ipv6-in-ubuntu-16-04-xenial-xerus/
 
 #below it can be customized
 - name: common | Append additional sources
