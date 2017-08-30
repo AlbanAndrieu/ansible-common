@@ -47,10 +47,10 @@ script:
   #- echo localhost > hosts
 
   # Check syntax
-  - sudo ansible-playbook -i hosts --syntax-check common.yml -e "python_versions=[3.4]"
+  - sudo ansible-playbook -i hosts --syntax-check common.yml -e "python_versions=[2.7]"
 
   # First run
-  - sudo ansible-playbook -i hosts --connection=local -vvvv common.yml -e "python_versions=[3.4]"
+  - sudo ansible-playbook -i hosts --connection=local -vvvv common.yml -e "python_versions=[2.7]"
 
   #- coverage run --source=yourpackagename setup.py test
 
