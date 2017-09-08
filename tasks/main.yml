@@ -3,8 +3,8 @@
 
 - name: common | Update APT caches.
   apt: update_cache=yes cache_valid_time={{ apt_cache_valid_time }}
-  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  become: yes
 
 - name: common | Update the configuration
   template:
@@ -13,8 +13,8 @@
     owner: root
     group: root
     mode: 0644
-  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  become: yes
 
 - name: common | Update the proxy configuration
   template:
@@ -27,13 +27,13 @@
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_proxy_enabled
 
 - name: common | Make sure the required packages are installed
-  apt: pkg={{ item }} state=present
-  become: yes
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   with_items:
     - python-apt
     - python-pycurl
     - aptitude
     - unattended-upgrades
+  become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
 
 - name: common | Upgrade system
@@ -44,7 +44,7 @@
 - name: common | Upgrade system
   yum: name=* state=latest
   become: yes
-  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux') and apt_upgrade_system_enabled
+  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat') and apt_upgrade_system_enabled
 
 - name: common | Checking if Sources are Available
   action: shell echo a$(cat /etc/apt/sources.list | grep $(echo   'http://url/{{ ansible_distribution }}/stable' | tr "[:upper:]" "[:lower:]"  ))
@@ -86,12 +86,12 @@
   become: yes
 
 - name: common | Install update notification tools
-  apt: pkg={{ item }} state=present update_cache=yes
-  become: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   tags: package
   with_items:
    - apticron
+  become: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
 
 - name: common | Update the update notification configuration
   template:
@@ -101,32 +101,30 @@
     group: root
     mode: 0644
   become: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
 
 - name: common | Install utility tools
-  apt: pkg={{ item }} state=present update_cache=yes
-  become: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   tags: package
   with_items:
    - wget
    - curl
    - ssh
+  become: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
 
 #See https://blog.serverdensity.com/80-linux-monitoring-tools-know/
 
 - name: common | Install monitoring tools
-  apt: pkg={{ item }} state=present update_cache=yes
-  become: yes
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   tags: package
   with_items:
    - htop
    - iotop
+  become: yes
 
 - name: common | Install monitoring tools
-  apt: pkg={{ item }} state=present update_cache=yes
-  become: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and stats_enabled
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   tags: package
   with_items:
    - nmap
@@ -138,6 +136,8 @@
    - gksu
    - powertop
    - discus
+  become: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and stats_enabled
 
 #TO CHECK sudo aptitude install cowsay fortunes fortunes-fr
 
@@ -148,7 +148,7 @@
   tags: cowsay
 
 - name: common | Install cowsay randomize lines
-  apt: pkg={{ item }} state=present update_cache=yes
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04'] and cowsay_enabled
   tags: cowsay
@@ -156,39 +156,46 @@
    - randomize-lines
 
 - name: common | Install cowsay
-  apt: pkg={{ item }} state=present update_cache=yes
-  become: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and cowsay_enabled
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   tags: package
   with_items:
    - cowsay
    - fortunes
    - fortunes-fr
+  become: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and cowsay_enabled
 
 - name: common | Install perl
-  apt: pkg={{ item }} state=present update_cache=yes
-  become: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   tags: package
   with_items:
    - perl
+  become: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
+
+- name: common | Install perl
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  tags: package
+  with_items:
    - libnet-ssleay-perl
-   - openssl
+#   - openssl
    - libauthen-pam-perl
    - libpam-runtime
    - libio-pty-perl
+  become: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
 
 - name: common | Install python tools
-  apt: pkg={{ item }} state=present update_cache=yes
-  become: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
+action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   tags: package
   with_items:
-#   - python
+#  - python
    - python-keyczar
    - python-setuptools
    - python-software-properties
    - build-essential
+  become: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
 
 #TODO Disable ipv6
 #http://www.neuraldump.com/2016/11/how-to-disable-ipv6-in-ubuntu-16-04-xenial-xerus/
@@ -196,12 +203,12 @@
 #below it can be customized
 - name: common | Append additional sources
   apt_repository: repo={{ item }} update_cache=yes
+  with_items: "{{apt_repositories}}"
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_repositories
-  with_items: "{{apt_repositories}}"
 
 - name: common | Install additional packages
   apt: pkg={{item}}
+  with_items: "{{apt_install_packages_list}}"
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_packages
-  with_items: "{{apt_install_packages_list}}"
