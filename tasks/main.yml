@@ -186,7 +186,7 @@
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
 
 - name: common | Install python tools
-action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   tags: package
   with_items:
 #  - python
