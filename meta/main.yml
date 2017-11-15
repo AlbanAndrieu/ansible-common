@@ -1,7 +1,7 @@
 ---
 #dependencies: []
 dependencies:
-  - { role: python, become: true }
+#  - { role: python, become: true }
   - { role: geerlingguy.ntp, become: true }
 #  - { role: ansible }
 #  - { role: locale }

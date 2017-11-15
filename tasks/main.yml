@@ -27,7 +27,7 @@
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_proxy_enabled
 
 - name: common | Make sure the required packages are installed
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
   with_items:
     - python-apt
     - python-pycurl
@@ -86,7 +86,7 @@
   become: yes
 
 - name: common | Install update notification tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
   tags: package
   with_items:
    - apticron
@@ -103,8 +103,19 @@
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
 
+- name: common | Install basic tools 
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  tags: package
+  with_items:
+   - upstart
+   - gksu
+   - screen    
+  become: yes
+  ignore_errors: true 
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
 - name: common | Install utility tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
   tags: package
   with_items:
    - wget
@@ -113,22 +124,58 @@
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
 
+- name: common | Install compression package
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ jenkins_pkg_state|default('present') }}"
+  with_items:
+    - tar
+    - zip
+    - unzip
+    - bzip2
+  become: yes
+#  ignore_errors: true
+
+- name: common | Install editor tools
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  tags: package
+  with_items:
+#   - apt-show-versions
+   - geany
+#   - xxdiff #Not available on Ubuntu
+#   - xxdiff-scripts
+  become: yes
+  ignore_errors: true    
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+- name: Install editor tools
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  tags: package
+  with_items:
+   - vim
+   - nano
+   - gedit
+   - meld
+   - dos2unix   
+  ignore_errors: true
+  become: yes
+
 #See https://blog.serverdensity.com/80-linux-monitoring-tools-know/
 
 - name: common | Install monitoring tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
-  tags: package
-  with_items:
-   - htop
-   - iotop
-  become: yes
-
-- name: common | Install monitoring tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
   tags: package
   with_items:
    - nmap
-   - iftop
+   - iotop
+   - iftop   
+   - htop
+   - sysstat
+  ignore_errors: true     
+  become: yes
+
+- name: common | Install monitoring tools
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  tags: package
+  with_items:
    - jnettop
    - iperf
 #   - monit   see https://galaxy.ansible.com/list#/roles/1575
@@ -136,27 +183,39 @@
    - gksu
    - powertop
    - discus
+  ignore_errors: true   
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and stats_enabled
+
+- name: common | Install extra
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  tags: package
+  with_items:
+   - ubuntu-restricted-extras
+#   - preload
+  become: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 #TO CHECK sudo aptitude install cowsay fortunes fortunes-fr
 
 - name: common | Install cowsay randomize lines
   apt_repository: repo="ppa:inameiname/stable" state={{ util_repository_state|default('present') }} update_cache=yes
+  ignore_errors: true   
   become: yes
   when: ( ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version in ['16.04']) and cowsay_enabled
   tags: cowsay
 
 - name: common | Install cowsay randomize lines
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  ignore_errors: true   
   become: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04'] and cowsay_enabled
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04','16.04'] and cowsay_enabled
   tags: cowsay
   with_items:
    - randomize-lines
 
 - name: common | Install cowsay
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
   tags: package
   with_items:
    - cowsay
@@ -166,7 +225,7 @@
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and cowsay_enabled
 
 - name: common | Install perl
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
   tags: package
   with_items:
    - perl
@@ -174,7 +233,7 @@
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
 
 - name: common | Install perl
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
   tags: package
   with_items:
    - libnet-ssleay-perl
@@ -186,10 +245,12 @@
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
 
 - name: common | Install python tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
   tags: package
   with_items:
 #  - python
+#  - python-pip
+#  - python-dev
    - python-keyczar
    - python-setuptools
    - python-software-properties
