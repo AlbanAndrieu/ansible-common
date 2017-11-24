@@ -65,8 +65,8 @@
 - name: common | Test ansible is installed
   shell: ansible --version
   register: ansible_is_installed
-  ignore_errors: yes
-  become: yes
+#  ignore_errors: yes
+#  become: yes
 
 - name: common | Run install script as sudo
   script: setup-ansible.sh
@@ -79,6 +79,7 @@
 - name: common | Run install script without sudo
   script: setup-ansible.sh
   become: yes
+  ignore_errors: yes
   when: ansible_is_installed|failed and ansible_init_used_sudo|skipped
 
 - name: common | Test ansible is installed

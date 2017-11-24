@@ -125,7 +125,7 @@ if [ "$?" == "1" ]; then
 fi
 
 echo -n "Installing ansible..."
-$sudo_cmd pip install ansible --upgrade && echo "OK"
+$sudo_cmd pip install ansible==2.4.1.0 && echo "OK"
 if [ "$?" == "1" ]; then
 	echo "FAILED"; exit 1
 fi
