@@ -9,11 +9,19 @@ cache:
   directories:
     - $HOME/.cache/pip
 env:
-  - ANSIBLE_VERSION=2.3.1.0
+#  - ANSIBLE_VERSION=latest
+  - ANSIBLE_VERSION=2.4.1.0
+#  - ANSIBLE_VERSION=2.3.1.0
+#  - ANSIBLE_VERSION=2.2.2.0  
 cache: bundler
 #sudo: false
 sudo: required
 dist: trusty
+
+branches:
+  only:
+    - master
+
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq python-apt python-pycurl
@@ -26,10 +34,12 @@ before_install:
   - pip install --no-index --find-links=$HOME/.cache/pip/wheels scipy
   - pip install --no-index --find-links=$HOME/.cache/pip/wheels cython
   - pip install coveralls
+
 install:
   # Install Ansible.
-  - sudo pip install ansible==$ANSIBLE_VERSION
-
+  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible; else pip install ansible==$ANSIBLE_VERSION; fi
+  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible-lint; fi
+  
   # Add ansible.cfg to pick up roles path.
   #- "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
 
@@ -41,16 +51,18 @@ install:
   - git clone https://github.com/AlbanAndrieu/ansible-java.git java
 
 script:
-  - sudo ansible --version
+  # Check ansible version
+  - ansible --version
+  #- export ANSIBLE_ROLES_PATH="../"
 
   # Prepare tests
   #- echo localhost > hosts
 
   # Check syntax
-  - sudo ansible-playbook -i hosts --syntax-check common.yml -e "python_versions=[2.7]"
+  - ansible-playbook -i hosts --syntax-check common.yml -e "python_versions=[2.7]"
 
   # First run
-  - sudo ansible-playbook -i hosts --connection=local -vvvv common.yml -e "python_versions=[2.7]"
+  - ansible-playbook -i hosts --connection=local --sudo -vvvv common.yml -e "python_versions=[2.7]"
 
   #- coverage run --source=yourpackagename setup.py test
 
