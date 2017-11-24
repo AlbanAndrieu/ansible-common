@@ -39,16 +39,16 @@ if [ "$os_type" == "Cygwin" ]; then
 elif [ "$os_type" == "GNU/Linux" ]; then
 	echo "Found Linux distro"
 	if [ "$(check_linux_distro Ubuntu)" == "0" ]; then
-		sudo_cmd=sudo
+		#sudo_cmd=sudo
 		echo "Found Ubuntu distro"
 		echo "Installing pip"
-		sudo apt-get install python-dev python-pip -y || exit 1
+		$sudo_cmd apt-get install python-dev python-pip -y || exit 1
 	elif [ "$(check_linux_distro CentOS)" == "0" ]; then
 		sudo_cmd=sudo
 		echo "Found CentOS distro"
-		sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
-		sudo yum install python-pip -y || exit 1
-		sudo yum install ansible -y || exit 1
+		$sudo_cmd rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+		$sudo_cmd yum install python-pip -y || exit 1
+		$sudo_cmd yum install ansible -y || exit 1
 	elif [ "$(check_linux_distro Red)" == "0" ]; then
 		sudo_cmd=sudo
 		echo "Found Red Hat distro"
@@ -90,7 +90,7 @@ elif [ "$os_type" == "GNU/Linux" ]; then
 
         pip -V
 
-		sudo pip2.7 install ansible || exit 1
+		$sudo_cmd pip2.7 install ansible==2.4.1.0 || exit 1
 	else
 		echo "Unknown Linux distro: $(cat /etc/issue)" && exit 1
 	fi
