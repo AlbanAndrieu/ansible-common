@@ -86,7 +86,8 @@
 - name: common | Test ansible is installed
   shell: ansible --version
   become: yes
-
+  ignore_errors: yes
+  
 - name: common | Install update notification tools
   action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
   tags: package
