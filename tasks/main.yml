@@ -197,7 +197,8 @@
    - ubuntu-restricted-extras
 #   - preload
   become: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  ignore_errors: true    
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version not in ['12.04'])
 
 #TO CHECK sudo aptitude install cowsay fortunes fortunes-fr
 
