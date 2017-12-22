@@ -83,7 +83,7 @@
   args:
     executable: /bin/bash
   become: yes
-  ignore_errors: yes  
+  ignore_errors: yes
   when: "ansible_is_installed|failed and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'CentOS')"
   register: ansible_init_used_sudo
 
@@ -97,7 +97,7 @@
   shell: ansible --version
   become: yes
   ignore_errors: yes
-  
+
 - name: common | Install update notification tools
   action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
   tags: package
@@ -116,15 +116,15 @@
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
 
-- name: common | Install basic tools 
+- name: common | Install basic tools
   action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   tags: package
   with_items:
    - upstart
    - gksu
-   - screen    
+   - screen
   become: yes
-  ignore_errors: true 
+  ignore_errors: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 - name: common | Install utility tools
@@ -156,7 +156,7 @@
 #   - xxdiff #Not available on Ubuntu
 #   - xxdiff-scripts
   become: yes
-  ignore_errors: true    
+  ignore_errors: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 - name: Install editor tools
@@ -167,7 +167,7 @@
    - nano
    - gedit
    - meld
-   - dos2unix   
+   - dos2unix
   ignore_errors: true
   become: yes
 
@@ -179,11 +179,11 @@
   with_items:
    - nmap
    - iotop
-   - iftop   
+   - iftop
    - htop
    - sysstat
    - dstat
-  ignore_errors: true     
+  ignore_errors: true
   become: yes
 
 - name: common | Install monitoring tools
@@ -197,7 +197,7 @@
    - gksu
    - powertop
    - discus
-  ignore_errors: true   
+  ignore_errors: true
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and stats_enabled
 
@@ -215,14 +215,14 @@
 
 - name: common | Install cowsay randomize lines
   apt_repository: repo="ppa:inameiname/stable" state={{ util_repository_state|default('present') }} update_cache=yes
-  ignore_errors: true   
+  ignore_errors: true
   become: yes
   when: ( ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version in ['16.04']) and cowsay_enabled
   tags: cowsay
 
 - name: common | Install cowsay randomize lines
   action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
-  ignore_errors: true   
+  ignore_errors: true
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04','16.04'] and cowsay_enabled
   tags: cowsay
