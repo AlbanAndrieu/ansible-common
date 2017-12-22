@@ -39,12 +39,22 @@
 - name: common | Upgrade system
   apt: upgrade={{ apt_upgrade }}
   become: yes
-  when: (apt_upgrade == "safe" or apt_upgrade == "full" or apt_upgrade == "dist") and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_upgrade_system_enabled
+  when: (apt_upgrade == "safe" or apt_upgrade == "full" or apt_upgrade == "dist") and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and repo_upgrade_system_enabled
 
 - name: common | Upgrade system
   yum: name=* state=latest
   become: yes
-  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat') and apt_upgrade_system_enabled
+  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat') and repo_upgrade_system_enabled
+
+- name: common | Clean repo cache
+  command: "apt-get autoremove"
+  become: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and repo_clean_system_enabled
+
+- name: common | Clean repo cache
+  command: "rm -fr /var/cache/yum/* && yum clean all && yum check-update "
+  become: yes
+  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat') and repo_clean_system_enabled
 
 - name: common | Checking if Sources are Available
   action: shell echo a$(cat /etc/apt/sources.list | grep $(echo   'http://url/{{ ansible_distribution }}/stable' | tr "[:upper:]" "[:lower:]"  ))
@@ -107,7 +117,7 @@
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
 
 - name: common | Install basic tools 
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
   tags: package
   with_items:
    - upstart
@@ -172,6 +182,7 @@
    - iftop   
    - htop
    - sysstat
+   - dstat
   ignore_errors: true     
   become: yes
 
@@ -197,7 +208,8 @@
    - ubuntu-restricted-extras
 #   - preload
   become: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  ignore_errors: true
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version not in ['12.04'])
 
 #TO CHECK sudo aptitude install cowsay fortunes fortunes-fr
 
@@ -224,6 +236,7 @@
    - cowsay
    - fortunes
    - fortunes-fr
+  ignore_errors: true
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and cowsay_enabled
 
