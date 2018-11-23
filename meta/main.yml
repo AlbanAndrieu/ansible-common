@@ -1,12 +1,8 @@
 ---
-#dependencies: []
-dependencies:
+dependencies: []
+#dependencies:
 #  - { role: python, become: true }
-  - { role: geerlingguy.ntp, become: true }
-#  - { role: ansible }
-#  - { role: locale }
-#  - { role: alban.andrieu.hostname }
-#  - { role: java }
+#  - { role: geerlingguy.ntp, become: true }
 
 galaxy_info:
   author: Alban Andrieu
@@ -23,20 +19,4 @@ galaxy_info:
       versions:
         - wheezy
         - jessie
-  categories: []
-
-#ansigenome_info:
-#  galaxy_id: ''
-#  galaxy_user: 'alban.andrieu'
-#  galaxy_name: 'common'
-#
-#  travis: True
-#
-#  synopsis: |
-#    common described in a few paragraphs....
-#
-#  usage: |
-#    Describe how to use common...
-#
-#  #custom: |
-#  #  Any custom output you want after the usage section...
+  galaxy_tags: []

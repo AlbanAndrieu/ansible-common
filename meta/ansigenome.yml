@@ -1,8 +1,8 @@
 ---
-#dependencies: []
-dependencies:
+dependencies: []
+#dependencies:
 #  - { role: python, become: true }
-  - { role: geerlingguy.ntp, become: true }
+#  - { role: geerlingguy.ntp, become: true }
 #  - { role: ansible }
 #  - { role: locale }
 #  - { role: alban.andrieu.hostname }
@@ -23,7 +23,7 @@ galaxy_info:
       versions:
         - wheezy
         - jessie
-  categories: []
+  galaxy_tags: []
 
 #ansigenome_info:
 #  galaxy_id: ''
