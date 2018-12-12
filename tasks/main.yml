@@ -269,10 +269,17 @@
 #  - python-dev
    - python-keyczar
    - python-setuptools
-   - python-software-properties
    - build-essential
   become: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
+
+- name: common | Install python tools
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  tags: package
+  with_items:
+   - python-software-properties
+  become: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04','16.04'] and python_enabled   
 
 #TODO Disable ipv6
 #http://www.neuraldump.com/2016/11/how-to-disable-ipv6-in-ubuntu-16-04-xenial-xerus/
