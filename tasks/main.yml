@@ -4,7 +4,7 @@
 - name: common | Update APT caches.
   apt: update_cache=yes cache_valid_time={{ apt_cache_valid_time }}
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
-  become: yes
+  become: true
 
 - name: common | Update the configuration
   template:
@@ -14,7 +14,7 @@
     group: root
     mode: 0644
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
-  become: yes
+  become: true
 
 - name: common | Update the proxy configuration
   template:
@@ -23,7 +23,7 @@
     owner: root
     group: root
     mode: 0644
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_proxy_enabled
 
 - name: common | Make sure the required packages are installed
@@ -33,34 +33,34 @@
     - python-pycurl
     - aptitude
     - unattended-upgrades
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
 
 - name: common | Upgrade system
   apt: upgrade={{ apt_upgrade }}
-  become: yes
+  become: true
   when: (apt_upgrade == "safe" or apt_upgrade == "full" or apt_upgrade == "dist") and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and repo_upgrade_system_enabled
 
 - name: common | Upgrade system
   yum: name=* state=latest
-  become: yes
+  become: true
   when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat') and repo_upgrade_system_enabled
 
 - name: common | Clean repo cache
   command: "apt-get autoremove"
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and repo_clean_system_enabled
 
 - name: common | Clean repo cache
   command: "rm -fr /var/cache/yum/* && yum clean all && yum check-update "
-  become: yes
+  become: true
   when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat') and repo_clean_system_enabled
 
 - name: common | Checking if Sources are Available
   action: shell echo a$(cat /etc/apt/sources.list | grep $(echo   'http://url/{{ ansible_distribution }}/stable' | tr "[:upper:]" "[:lower:]"  ))
   register: sources
   ignore_errors: true
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 - debug: msg=" common | sources value is {{ sources.stdout }} "
@@ -68,7 +68,7 @@
 
 - name: common | Adding source.
   action: shell echo "deb http://url/{{ ansible_distribution }}/stable      {{ ansible_lsb.codename }} main" | tr "[:upper:]" "[:lower:]" >> /etc/apt/sources.list
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' and sources.stdout == 'a')
 #      when: "ansible_os_family == 'RedHat' and sources.stdout == 'a'"
 
@@ -76,26 +76,26 @@
   shell: ansible --version
   register: ansible_is_installed
   ignore_errors: yes
-#  become: yes
+#  become: true
 
 - name: common | Run install script as sudo
   script: setup-ansible.sh
   args:
     executable: /bin/bash
-  become: yes
+  become: true
   ignore_errors: yes
   when: "ansible_is_installed|failed and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'CentOS')"
   register: ansible_init_used_sudo
 
 - name: common | Run install script without sudo
   script: setup-ansible.sh
-  become: yes
+  become: true
   ignore_errors: yes
   when: ansible_is_installed|failed and ansible_init_used_sudo|skipped
 
 - name: common | Test ansible is installed
   shell: ansible --version
-  become: yes
+  become: true
   ignore_errors: yes
 
 - name: common | Install update notification tools
@@ -103,7 +103,7 @@
   tags: package
   with_items:
    - apticron
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
 
 - name: common | Update the update notification configuration
@@ -113,7 +113,7 @@
     owner: root
     group: root
     mode: 0644
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
 
 - name: common | Install basic tools
@@ -123,7 +123,7 @@
    - upstart
    - gksu
    - screen
-  become: yes
+  become: true
   ignore_errors: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
@@ -134,17 +134,17 @@
    - wget
    - curl
    - ssh
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
 
 - name: common | Install compression package
-  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ jenkins_pkg_state|default('present') }}"
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   with_items:
     - tar
     - zip
     - unzip
     - bzip2
-  become: yes
+  become: true
 #  ignore_errors: true
 
 - name: common | Install editor tools
@@ -155,7 +155,7 @@
    - geany
 #   - xxdiff #Not available on Ubuntu
 #   - xxdiff-scripts
-  become: yes
+  become: true
   ignore_errors: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
@@ -169,7 +169,7 @@
    - meld
    - dos2unix
   ignore_errors: true
-  become: yes
+  become: true
 
 #See https://blog.serverdensity.com/80-linux-monitoring-tools-know/
 
@@ -184,7 +184,7 @@
    - sysstat
    - dstat
   ignore_errors: true
-  become: yes
+  become: true
 
 - name: common | Install monitoring tools
   action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
@@ -198,7 +198,7 @@
    - powertop
    - discus
   ignore_errors: true
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and stats_enabled
 
 - name: common | Install extra
@@ -207,7 +207,7 @@
   with_items:
    - ubuntu-restricted-extras
 #   - preload
-  become: yes
+  become: true
   ignore_errors: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version not in ['12.04'])
 
@@ -216,14 +216,14 @@
 - name: common | Install cowsay randomize lines
   apt_repository: repo="ppa:inameiname/stable" state={{ util_repository_state|default('present') }} update_cache=yes
   ignore_errors: true
-  become: yes
+  become: true
   when: ( ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version in ['16.04']) and cowsay_enabled
   tags: cowsay
 
 - name: common | Install cowsay randomize lines
   action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
   ignore_errors: true
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04','16.04'] and cowsay_enabled
   tags: cowsay
   with_items:
@@ -237,7 +237,7 @@
    - fortunes
    - fortunes-fr
   ignore_errors: true
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and cowsay_enabled
 
 - name: common | Install perl
@@ -245,7 +245,7 @@
   tags: package
   with_items:
    - perl
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
 
 - name: common | Install perl
@@ -257,7 +257,7 @@
    - libauthen-pam-perl
    - libpam-runtime
    - libio-pty-perl
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
 
 - name: common | Install python tools
@@ -270,7 +270,7 @@
    - python-keyczar
    - python-setuptools
    - build-essential
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
 
 - name: common | Install python tools
@@ -278,7 +278,7 @@
   tags: package
   with_items:
    - python-software-properties
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04','16.04'] and python_enabled   
 
 #TODO Disable ipv6
@@ -288,11 +288,11 @@
 - name: common | Append additional sources
   apt_repository: repo={{ item }} update_cache=yes
   with_items: "{{apt_repositories}}"
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_repositories
 
 - name: common | Install additional packages
   apt: pkg={{item}}
   with_items: "{{apt_install_packages_list}}"
-  become: yes
+  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_packages
