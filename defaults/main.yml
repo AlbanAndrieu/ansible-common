@@ -1,27 +1,37 @@
-apt_cache_valid_time: 3600    # Time (in seconds) the apt cache stays valid
-repo_clean_system_enabled: no
-repo_upgrade_system_enabled: no
-apt_upgrade: safe             # Perfoms aptupgrade. Values are (safe, full, dist)
-apt_install_recommends: no    # Install the "recommended" packages
-apt_install_suggests: no      # Install the "suggested" packages
+---
+apt_cache_valid_time: 3600       # Time (in seconds) the apt cache stays valid
+repo_clean_system_enabled: false
+repo_upgrade_system_enabled: false
+apt_upgrade: safe                # Perfoms apt upgrade. Values are (safe, full, dist)
+yum_upgrade: latest              # Perfoms yum upgrade.
+apt_install_recommends: false    # Install the "recommended" packages
+apt_install_suggests: false      # Install the "suggested" packages
 apt_install_proxy: 'http://yourproxyaddress:proxyport'
-apt_install_proxy_enabled: no
-apt_install_repositories: no  # Install some repositories (see list bellow)
-apt_repositories: []          # List of sources which be added
-apt_install_packages: no      # Install some utilities (see lise bellow)
-apt_install_packages_list:    # List of packages which be installed
+apt_install_proxy_enabled: false
+apt_install_repositories: false  # Install some repositories (see list bellow)
+apt_repositories: []             # List of sources which be added
+apt_install_packages: false      # Install some utilities (see lise bellow)
+apt_install_packages_list:       # List of packages which be installed
   - command-not-found
   - mosh
   - pciutils
   - screen
 
-stats_enabled           : yes
-utilities_enabled       : yes
-editors_enabled         : yes
-cowsay_enabled          : yes
-perl_enabled            : yes
-python_enabled          : yes
+stats_enabled: true
+utilities_enabled: true
+editors_enabled: true
+cowsay_enabled: true
+perl_enabled: true
+python_enabled: true
 # for pip_version, please see python_versions: [2.7, 3.4] from role https://github.com/Stouts/Stouts.python.git python
-python_versions         : [2.7]
+python_versions: [2.7]
 apt_notification_email: "root"
 util_repository_state: present
+
+# Who has sudo access - use %foo for groups
+sudo_users:
+  - "%wheel"
+  - "%jenkins"
+
+# Do users need to enter a password?
+sudo_nopasswd: true

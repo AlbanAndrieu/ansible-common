@@ -3,3 +3,5 @@
   hosts: all
   roles:
     - role: alban.andrieu.common
+      verbose: true
+  no_log: false

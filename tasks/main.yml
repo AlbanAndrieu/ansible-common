@@ -5,6 +5,7 @@
   apt: update_cache=yes cache_valid_time={{ apt_cache_valid_time }}
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
   become: true
+  tags: vm
 
 - name: common | Update the configuration
   template:
@@ -15,6 +16,7 @@
     mode: 0644
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
   become: true
+  tags: vm
 
 - name: common | Update the proxy configuration
   template:
@@ -25,86 +27,116 @@
     mode: 0644
   become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_proxy_enabled
+  tags: vm
 
 - name: common | Make sure the required packages are installed
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   with_items:
-    - python-apt
-    - python-pycurl
     - aptitude
     - unattended-upgrades
-  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
+  become: true
+
+- name: common | Make sure the required python packages are installed
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
+  with_items:
+    - python-keyczar
+    - python-setuptools
+    - build-essential
+    - python-apt
+    - python-pycurl
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
+  become: true
+  tags:
+    - pip
+    - python
+
+- name: common | Make sure the required python packages are installed
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
+  with_items:
+    - python-software-properties
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ("12.04", "14.04", "16.04") and python_enabled
+  become: true
+
+- name: common | Make sure the required python packages are installed
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
+  with_items:
+    - software-properties-common
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version not in ("12.04", "14.04", "16.04") and python_enabled
+  become: true
+
+- name: common | Make sure the required python packages are installed
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
+  with_items:
+    - python-pip
+  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat') and python_enabled
+  become: true
+  ignore_errors: true
+  tags:
+    - pip
+    - python
 
 - name: common | Upgrade system
   apt: upgrade={{ apt_upgrade }}
-  become: true
   when: (apt_upgrade == "safe" or apt_upgrade == "full" or apt_upgrade == "dist") and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and repo_upgrade_system_enabled
-
-- name: common | Upgrade system
-  yum: name=* state=latest
   become: true
+  tags:
+    - upgrade
+    - vm
+
+- name: common | Upgrade system # noqa 403
+  yum: name=* state={{ yum_upgrade }}
   when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat') and repo_upgrade_system_enabled
+  become: true
+  tags:
+    - upgrade
+    - vm
 
 - name: common | Clean repo cache
   command: "apt-get autoremove"
-  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and repo_clean_system_enabled
+  become: true
+  tags:
+    - clean
+    - vm
 
 - name: common | Clean repo cache
-  command: "rm -fr /var/cache/yum/* && yum clean all && yum check-update "
-  become: true
+  command: "rm -fr /var/cache/yum/* && yum clean all"
   when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat') and repo_clean_system_enabled
+  become: true
+  tags:
+    - clean
+    - vm
 
 - name: common | Checking if Sources are Available
   action: shell echo a$(cat /etc/apt/sources.list | grep $(echo   'http://url/{{ ansible_distribution }}/stable' | tr "[:upper:]" "[:lower:]"  ))
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
   register: sources
   ignore_errors: true
   become: true
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  tags: vm
 
 - debug: msg=" common | sources value is {{ sources.stdout }} "
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  ignore_errors: true
 
 - name: common | Adding source.
   action: shell echo "deb http://url/{{ ansible_distribution }}/stable      {{ ansible_lsb.codename }} main" | tr "[:upper:]" "[:lower:]" >> /etc/apt/sources.list
-  become: true
   when: (ansible_distribution == 'Debian' and sources.stdout == 'a')
-#      when: "ansible_os_family == 'RedHat' and sources.stdout == 'a'"
-
-- name: common | Test ansible is installed
-  shell: ansible --version
-  register: ansible_is_installed
-  ignore_errors: yes
-#  become: true
-
-- name: common | Run install script as sudo
-  script: setup-ansible.sh
-  args:
-    executable: /bin/bash
   become: true
-  ignore_errors: yes
-  when: "ansible_is_installed|failed and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'CentOS')"
-  register: ansible_init_used_sudo
-
-- name: common | Run install script without sudo
-  script: setup-ansible.sh
-  become: true
-  ignore_errors: yes
-  when: ansible_is_installed|failed and ansible_init_used_sudo|skipped
-
-- name: common | Test ansible is installed
-  shell: ansible --version
-  become: true
-  ignore_errors: yes
+  tags:
+    - package
+    - vm
 
 - name: common | Install update notification tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
-  tags: package
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   with_items:
-   - apticron
-  become: true
+    - apticron
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
+  become: true
+  tags:
+    - package
+    - vm
 
 - name: common | Update the update notification configuration
   template:
@@ -113,186 +145,177 @@
     owner: root
     group: root
     mode: 0644
-  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
+  become: true
+  tags: vm
+
+- name: common | Install tools
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }} update_cache=yes"
+  with_items:
+    - upstart
+    - gksu             # https://itsfoss.com/gksu-replacement-ubuntu/
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and (ansible_distribution_version in ['12.04', '14.04', '16.04'])
+  become: true
+  tags:
+    - package
+    - vm
 
 - name: common | Install basic tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }} update_cache=yes"
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ common_pkg_state|default('present') }}"
   tags: package
   with_items:
-   - upstart
-   - gksu
-   - screen
+    - screen
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
   become: true
   ignore_errors: true
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 - name: common | Install utility tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   tags: package
   with_items:
-   - wget
-   - curl
-   - ssh
-  become: true
+    - wget
+    - curl
+    - ssh
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
+  become: true
 
 - name: common | Install compression package
-  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ jenkins_pkg_state|default('present') }}"
   with_items:
     - tar
     - zip
     - unzip
     - bzip2
   become: true
-#  ignore_errors: true
-
-- name: common | Install editor tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
-  tags: package
-  with_items:
-#   - apt-show-versions
-   - geany
-#   - xxdiff #Not available on Ubuntu
-#   - xxdiff-scripts
-  become: true
-  ignore_errors: true
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 - name: Install editor tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   tags: package
   with_items:
-   - vim
-   - nano
-   - gedit
-   - meld
-   - dos2unix
+    - vim
+    - nano
+    - gedit
+    - geany
+    - meld
+    - dos2unix
   ignore_errors: true
   become: true
 
 #See https://blog.serverdensity.com/80-linux-monitoring-tools-know/
 
 - name: common | Install monitoring tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
-  tags: package
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   with_items:
-   - nmap
-   - iotop
-   - iftop
-   - htop
-   - sysstat
-   - dstat
+    - nmap
+    - iotop
+    - iftop
+    - htop
+    - sysstat
+    - dstat
   ignore_errors: true
   become: true
+  tags:
+    - package
+    - vm
 
 - name: common | Install monitoring tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
-  tags: package
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   with_items:
-   - jnettop
-   - iperf
-#   - monit   see https://galaxy.ansible.com/list#/roles/1575
-   - upstart
-   - gksu
-   - powertop
-   - discus
+    - jnettop
+    - iperf
+#    - monit   # see https://galaxy.ansible.com/list#/roles/1575
+    - powertop
+    - discus
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and stats_enabled
   ignore_errors: true
   become: true
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and stats_enabled
+  tags:
+    - package
+    - vm
+
+# apt-cache policy ubuntu-restricted-extras
+# check for multiverse
 
 - name: common | Install extra
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
-  tags: package
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   with_items:
-   - ubuntu-restricted-extras
-#   - preload
+    - ubuntu-restricted-extras
+#    - preload
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version not in ['12.04'])
   become: true
   ignore_errors: true
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version not in ['12.04'])
+  tags:
+    - package
+    - vm
 
-#TO CHECK sudo aptitude install cowsay fortunes fortunes-fr
+# TO CHECK sudo aptitude install cowsay fortunes fortunes-fr
 
 - name: common | Install cowsay randomize lines
   apt_repository: repo="ppa:inameiname/stable" state={{ util_repository_state|default('present') }} update_cache=yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version in ['16.04']) and cowsay_enabled
+  tags:
+    - cowsay
+    - vm
   ignore_errors: true
   become: true
-  when: ( ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version in ['16.04']) and cowsay_enabled
-  tags: cowsay
 
 - name: common | Install cowsay randomize lines
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
-  ignore_errors: true
-  become: true
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04','16.04'] and cowsay_enabled
-  tags: cowsay
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   with_items:
-   - randomize-lines
+    - randomize-lines
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04','16.04'] and cowsay_enabled
+  tags:
+    - package
+    - cowsay
+    - vm
+  become: true
+  ignore_errors: true
 
 - name: common | Install cowsay
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
-  tags: package
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   with_items:
-   - cowsay
-   - fortunes
-   - fortunes-fr
+    - cowsay
+    - fortunes
+    - fortunes-fr
   ignore_errors: true
-  become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and cowsay_enabled
+  tags:
+    - package
+    - cowsay
+    - vm
+  become: true
 
 - name: common | Install perl
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   tags: package
   with_items:
-   - perl
+    - perl
   become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
 
 - name: common | Install perl
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   tags: package
   with_items:
-   - libnet-ssleay-perl
+    - libnet-ssleay-perl
 #   - openssl
-   - libauthen-pam-perl
-   - libpam-runtime
-   - libio-pty-perl
-  become: true
+    - libauthen-pam-perl
+    - libpam-runtime
+    - libio-pty-perl
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
-
-- name: common | Install python tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
-  tags: package
-  with_items:
-#  - python
-#  - python-pip
-#  - python-dev
-   - python-keyczar
-   - python-setuptools
-   - build-essential
   become: true
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
 
-- name: common | Install python tools
-  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{ common_pkg_state|default('present') }}"
-  tags: package
-  with_items:
-   - python-software-properties
-  become: true
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04','16.04'] and python_enabled   
-
-#TODO Disable ipv6
-#http://www.neuraldump.com/2016/11/how-to-disable-ipv6-in-ubuntu-16-04-xenial-xerus/
-
-#below it can be customized
+# below it can be customized
 - name: common | Append additional sources
   apt_repository: repo={{ item }} update_cache=yes
-  with_items: "{{apt_repositories}}"
-  become: true
+  with_items: "{{ apt_repositories }}"
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_repositories
+  become: true
 
 - name: common | Install additional packages
-  apt: pkg={{item}}
-  with_items: "{{apt_install_packages_list}}"
-  become: true
+  apt: pkg={{ item }}
+  with_items: "{{ apt_install_packages_list }}"
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and apt_install_packages
+  become: true
+  tags:
+    - package
