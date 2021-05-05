@@ -10,8 +10,7 @@ repos:
 # pre-commit-hooks.git from v2.1.0 to v2.4.0
 #    rev: v2.1.0 # ok python3.6  # 18.04.3
 #    rev: v2.2.3 # ok python3.6  # 19.04 but failing on 18.04.3
-#    rev: v2.4.0 # ok python3.6 on Ubuntu 18.04 AND python3.7 on Ubuntu 19.04
-    rev: v3.3.0
+    rev: v3.4.0 # ok python3.6 on Ubuntu 18.04 AND python3.7 on Ubuntu 19.04
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
@@ -28,18 +27,21 @@ repos:
                       .mvn/
                   )$
     -   id: check-json
-        exclude: ^.vscode/
     -   id: check-xml
     -   id: check-yaml
+        exclude: >
+          (?x)^(
+              k8s/.*|
+          )$
     -   id: check-symlinks
     -   id: check-merge-conflict
     -   id: debug-statements
-        exclude: ^.cache/
     -   id: detect-private-key
         exclude: >
                   (?x)^(
-                      README.md|
                       .ssh/id_rsa|
+                      roles/jenkins-master/defaults/main.yml|
+                      roles/jenkins-master/README.md|
                   )$
     -   id: double-quote-string-fixer
     -   id: name-tests-test
@@ -47,45 +49,36 @@ repos:
                   (?x)^(
                       .*/molecule/default/tests/test_default.py|
                   )$
-#    -   id: no-commit-to-branch
-#        args: [--branch, develop, --branch, master, --branch, release/*]
+    -   id: no-commit-to-branch
+        args: [--branch, develop, --branch, master, --branch, release/*]
     -   id: end-of-file-fixer
     -   id: fix-encoding-pragma
     -   id: requirements-txt-fixer
     -   id: sort-simple-yaml
     -   id: file-contents-sorter
 -   repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v1.5.4
+    rev: v1.5.7
     hooks:
     -   id: autopep8
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.4
+    rev: 3.9.1  # Use the sha / tag you want to point at
     hooks:
     -   id: flake8
         args: [--max-line-length=120]
-#-   repo: https://github.com/Lucas-C/pre-commit-hooks
-#    rev: v1.1.6
-#    hooks:
-#    -   id: remove-crlf
-#    -   id: remove-tabs
-#        args: [ --whitespaces-count, 2 ]
 -   repo: https://github.com/pre-commit/pre-commit.git
-    rev: v2.8.2
+    rev: v2.12.1
     hooks:
     -   id: validate_manifest
 -   repo: https://github.com/asottile/reorder_python_imports.git
-    rev: v2.3.6
+    rev: v2.5.0
     hooks:
     -   id: reorder-python-imports
-        exclude: ^.cache/
-#       language_version: python3
-#       language_version: python2.7
 -   repo: https://github.com/asottile/add-trailing-comma
-    rev: v2.0.1
+    rev: v2.1.0
     hooks:
     -   id: add-trailing-comma
 -   repo: https://github.com/willthames/ansible-lint.git
-    rev: v4.3.7
+    rev: v5.0.8
     hooks:
     -   id: ansible-lint
         files: \.(yaml|yml)$
@@ -112,17 +105,17 @@ repos:
                       hooks|
                   )$
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.7.4
+    rev: v2.14.0
     hooks:
     -   id: pyupgrade
 -   repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v1.5.4
+    rev: v1.5.7
     hooks:
     -   id: autopep8
--   repo: https://github.com/PyCQA/bandit
-    rev: 1.6.2
-    hooks:
-    - id: bandit
+#-   repo: https://github.com/PyCQA/bandit
+#    rev: master
+#    hooks:
+#    - id: bandit
 -   repo: https://github.com/IamTheFij/ansible-pre-commit
     rev: v0.1.2
     hooks:
@@ -133,43 +126,15 @@ repos:
     -   id: htmlhint
         args: [--config, .htmlhintrc]
     -   id: markdown-toc
+        # optional custom config:
+        #args: [--indent, "    ", -i]
         args: [--maxdepth, "3", -i]
     -   id: dockerfile_lint
         args: [--json, --verbose, --dockerfile]
-#-   repo: https://github.com/AlbanAndrieu/nabla-hooks.git
-#    rev: v1.0.0
-#    hooks:
-#    - id: git-branches-check
-#-   repo: local
-#    hooks:
-#    -   id: git-branches-check
-#        name: Git branches check
-#        description: Check for old stale and already merged branches from the current repo with user friendly messages and colors
-#        entry: pre_commit_hooks/git-branches-check.sh
-#        language: script
-#        types: [shell]
-#        always_run: true
-#        verbose: true
-#        additional_dependencies: [jira>=2.0.0]
-#        #args: [--max=1, --verbose, --debug]
-#-   repo: local
-#    hooks:
-#    -   id: jenkinsfile-check
-#        name: Jenkinsfile check
-#        description: Check if Jenkinsfile is valid
-#        entry: pre_commit_hooks/jenkinsfile-check.sh Jenkinsfile
-#        files: 'Jenkinsfile'
-#        language: script
-#        types: [shell]
-#        always_run: true
-#        verbose: true
-#-   repo: local
-#    hooks:
-#    -   id: publicversion-check
-#        name: PublicVersion check
-#        description: Check if version is valid
-#        entry: ./test/version.sh
-#        language: script
-#        types: [shell]
-#        always_run: true
-#        verbose: true
+-   repo: https://github.com/AlbanAndrieu/nabla-hooks.git
+    rev: v1.0.1
+    hooks:
+    -   id: git-branches-check
+        always_run: true
+        args: [--max=3]
+        verbose: true

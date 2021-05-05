@@ -162,22 +162,34 @@
 
 - name: common | Install basic tools
   action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ common_pkg_state|default('present') }}"
-  tags: package
   with_items:
     - screen
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
   become: true
   ignore_errors: true
+  tags:
+    - package
+    - vm
 
 - name: common | Install utility tools
   action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
-  tags: package
   with_items:
     - wget
     - curl
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
+  become: true
+  tags: package
+
+- name: common | Install ssh tools
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
+  tags: package
+  with_items:
     - ssh
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and utilities_enabled
   become: true
+  tags:
+    - package
+    - vm
 
 - name: common | Install compression package
   action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ jenkins_pkg_state|default('present') }}"
@@ -188,18 +200,28 @@
     - bzip2
   become: true
 
-- name: Install editor tools
+- name: Install simple editor tools
   action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
-  tags: package
   with_items:
     - vim
     - nano
-    - gedit
-    - geany
-    - meld
     - dos2unix
   ignore_errors: true
   become: true
+  tags:
+    - editor
+
+- name: Install editor tools
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
+  with_items:
+    - gedit
+    - geany
+    - meld
+  ignore_errors: true
+  become: true
+  tags:
+    - editor
+    - vm
 
 #See https://blog.serverdensity.com/80-linux-monitoring-tools-know/
 
@@ -253,23 +275,23 @@
 - name: common | Install cowsay randomize lines
   apt_repository: repo="ppa:inameiname/stable" state={{ util_repository_state|default('present') }} update_cache=yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' ) and (ansible_distribution_version in ['16.04']) and cowsay_enabled
+  ignore_errors: true
+  become: true
   tags:
     - cowsay
     - vm
-  ignore_errors: true
-  become: true
 
 - name: common | Install cowsay randomize lines
   action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
   with_items:
     - randomize-lines
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version in ['12.04','14.04','16.04'] and cowsay_enabled
+  become: true
+  ignore_errors: true
   tags:
     - package
     - cowsay
     - vm
-  become: true
-  ignore_errors: true
 
 - name: common | Install cowsay
   action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
@@ -279,23 +301,22 @@
     - fortunes-fr
   ignore_errors: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and cowsay_enabled
+  become: true
   tags:
     - package
     - cowsay
     - vm
-  become: true
 
 - name: common | Install perl
   action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
-  tags: package
   with_items:
     - perl
   become: true
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
+  tags: package
 
 - name: common | Install perl
   action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
-  tags: package
   with_items:
     - libnet-ssleay-perl
 #   - openssl
@@ -304,6 +325,7 @@
     - libio-pty-perl
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and perl_enabled
   become: true
+  tags: package
 
 # below it can be customized
 - name: common | Append additional sources
