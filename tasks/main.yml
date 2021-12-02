@@ -35,8 +35,8 @@
     - aptitude
     - unattended-upgrades
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
-  ignore_errors: true
   become: true
+  ignore_errors: true
 
 - name: common | Make sure the required python packages are installed
   action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
@@ -46,7 +46,7 @@
     - build-essential
     - python-apt
     - python-pycurl
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and python_enabled
+  when: ((ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version is version_compare(18.04, '<=')) and python_enabled
   become: true
   tags:
     - pip
